@@ -1,0 +1,84 @@
+extends ../includes/header
+
+block content
+
+  .container
+    h1.page-header= title
+    include ../includes/uexc
+        
+    p= 'Number of running processes: '
+      span.badge= queue.length
+    
+    .form-group
+      .btn-group.btn-group-xs
+        button#allSigstop.btn.btn-warning(type='button' title='Halt all processes.')
+          span.glyphicon.glyphicon-pause
+          |  Pause All
+        button#allSigcont.btn.btn-success(type='button' title='Continue all processes.')
+          span.glyphicon.glyphicon-play
+          |  Resume All
+        button#allSigkill.btn.btn-danger(type='button' title='Terminate all processes.')
+          span.glyphicon.glyphicon-stop
+          |  Stop All
+
+    .row
+      #queue.table-wrapper.scrollable.thumbnail
+        table.table.line-wrapper.table-hover
+          thead
+            tr
+              th| RID
+              th| PID
+              th| Priority*
+              th| Signals
+              th| Inputs
+              th| Output
+              th| Progress
+          
+          tbody
+            if queue.process
+              each process in queue.process
+                tr(id= process.rid)
+                  td
+                    p.rid= process.rid
+                  
+                  td
+                    p.pid= process.command.ffmpegProc.pid
+                  
+                  td
+                    p.niceness= process.command.options.niceness
+                  
+                  td
+                    .btn-group.btn-group-xs(style='width: 75px;')
+                      button.btn.btn-warning.qsigstop(type='button' title='Halt the process.')
+                        span.glyphicon.glyphicon-pause
+                      button.btn.btn-success.qsigcont(type='button' title='Continue the process.')
+                        span.glyphicon.glyphicon-play
+                      button.btn.btn-danger.qsigkill(type='button' title='Terminate the process.')
+                        span.glyphicon.glyphicon-stop
+                    .btn-group.btn-group-xs
+                      button.btn.btn-default.qreniceup(type='button' title='Raise its priority.')
+                        span.glyphicon.glyphicon-chevron-up
+                      button.btn.btn-default.qrenicedown(type='button' title='Reduce its priority.')
+                        span.glyphicon.glyphicon-chevron-down
+
+                  td
+                    each input in process.command._inputs
+                      p.inputs
+                        a(href= input.source.split('public/')[1])= input.source.split('/').pop()
+                  
+                  td
+                    p.outputs
+                      a(href= process.command._outputs[0].target.split('public/')[1])= process.command._outputs[0].target.split('/').pop()
+                    
+                  td
+                  
+      .help-block
+        | *) Parameter may range from -20 (highest priority) to 20 (lowest
+        |  priority) and defaults to 0 (which is the default process niceness
+        |  on most *nix systems).
+        strong
+          |  Note
+        |: this method is ineffective on Windows platforms.
+
+  script(type='text/javascript' src='https://cdn.socket.io/socket.io-1.3.4.js')
+  script(type='text/javascript' src='/javascripts/socket.js')

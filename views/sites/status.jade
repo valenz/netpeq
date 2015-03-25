@@ -1,0 +1,27 @@
+doctype html
+html(lang='en')
+  head
+    meta(charset='utf-8')
+
+    title LIP-Support | #{title}
+
+    link(rel='stylesheet' type='text/css' href='//fonts.googleapis.com/css?family=Audiowide')
+    link(rel='stylesheet' type='text/css' href='//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css')
+
+  body
+    div(style='margin: 0 auto; width: 750px; padding: 50px 5px 0 5px; text-align: left;')
+      div(style='color: #FBFBFB; text-shadow: 0 1px 1px #454578, 0 -1px 1px #FFF;')
+        i.fa.fa-fire(style='font-size: 120px;')
+        br
+        span(style='font-family: Audiowide, cursive; font-size: 38px;')= fallover.status
+
+      div(style='font-size: 12px; color: #454578;')
+        pre#log= fallover
+
+        if header
+          for i, j in header
+            p(style='color: #A6A6A6;').
+              #{j} : #{i}
+
+        p
+          a(href='/')| Home

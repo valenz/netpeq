@@ -1,0 +1,14 @@
+extends includes/header
+
+block content
+
+  .container
+    h1.page-header= title
+    include includes/uexc
+
+    h4| Welcome to FFmpeg
+
+    form(role='form' action='/queue' method='post' enctype='multipart/form-data')
+      p| You can #[a(href='/upload') upload]
+        = ' new video content or take a look to the '
+        a.btn.btn-primary.btn-xs(href='/queue')| Queue

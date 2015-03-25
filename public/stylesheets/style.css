@@ -1,0 +1,115 @@
+video, img {
+  width: 100% !important;
+  height: auto !important;
+}
+
+audio {
+  width: 100% !important;
+}
+
+input[readonly] {
+  background-color: white !important;
+  cursor: text !important;
+}
+
+input[type=range] {}
+
+input[class^=range] {
+  padding: 0 10px 0 10px;
+}
+
+
+
+#grid {
+  margin: 0 auto;
+  padding-left: 0;
+}
+
+#grid li {
+  vertical-align: middle;
+  margin: 6px 12px 6px 12px;
+  zoom: 1;
+  position: relative;
+  *display: inline;
+  display: -moz-inline-stack;
+  display: inline-block;
+}
+
+
+
+.rangeValue {
+  padding: 0 10px 0 10px;
+}
+
+.btn-file {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-file input[type=file] {
+  position: absolute;
+  top: 0;
+  right: 0;
+  min-width: 100%;
+  min-height: 100%;
+  font-size: 100px;
+  text-align: right;
+  filter: alpha(opacity=0);
+  opacity: 0;
+  outline: none;
+  background: white;
+  cursor: inherit;
+  display: block;
+}
+
+.breakall {
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.scrollable {
+  width: auto;
+  overflow: scroll;
+}
+
+
+
+/**
+* LOG
+*/
+.table-wrapper {
+  height: 500px;
+}
+
+.line-wrapper {
+  text-align: center;
+  margin: 0;
+}
+
+.line-wrapper th {
+  text-align: center;
+}
+
+.line-wrapper td {
+  vertical-align: top;
+}
+
+.line-wrapper td:first-child {
+  margin: 0;
+  text-align: right;
+  padding: 8px 3px 8px 3px;
+  width: auto;
+}
+
+.line-wrapper td:last-child {
+  margin: 0;
+  text-align: left;
+  padding: 8px 3px 8px 3px;
+  width: 100%;
+}
+
+.line-wrapper p {
+  margin: 0;
+  padding: 0 3px 0 3px;
+  width: auto;
+}

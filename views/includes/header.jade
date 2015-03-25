@@ -1,0 +1,22 @@
+doctype html
+html(lang='en')
+  head
+    title FFmpeg | #{title}
+
+    meta(charset='utf-8')
+    meta(name='viewport' content='width=device-width, initial-scale=1')
+
+    link(rel='stylesheet' type='text/css' href='/stylesheets/style.css')
+    link(rel='stylesheet' type='text/css' href='/stylesheets/bootstrap-select.css')
+    link(rel='stylesheet' type='text/css' href='http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css')
+
+    block scripts
+      script(type='text/javascript' src='http://code.jquery.com/jquery-1.11.2.min.js')
+      script(type='text/javascript' src='http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js')
+      script(type='text/javascript' src='/javascripts/bootstrap-select.js')
+      script(type='text/javascript' src='/javascripts/script.js')
+
+  body
+    include menu
+
+    block content

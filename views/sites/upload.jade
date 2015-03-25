@@ -1,0 +1,33 @@
+extends ../includes/header
+
+block content
+
+
+  .container
+    .row
+      .col-xs-2.col-sm-2.col-md-3.col-lg-3
+      .col-xs-8.col-sm-8.col-md-6.col-lg-6
+        h1.page-header= title
+        include ../includes/uexc
+            
+        form(role='form' action='/upload' method='post' enctype='multipart/form-data')
+          .form-group
+            label(for='file')| Choose a file:
+            .input-group
+              .input-group-btn
+                span.btn.btn-primary.btn-file
+                  span.glyphicon.glyphicon-hdd
+                  |  Browse
+                  input.form-control(type='file' name='upload' title='Choose a file to upload.' multiple required)
+              input.form-control(type='text' placeholder='Choose a file' readonly)
+          .form-group
+            label(for='name')| Name:
+            input#name.form-control(type='text' name='name' title='Type a different name for the file.' placeholder='Name')
+          .form-group
+            label.checkbox-inline(title='Upload for asset content')
+              input(type='checkbox' name='asset' title='Upload for asset content')
+              | Asset
+          button.btn.btn-primary.btn-md(type='submit' title='Upload')
+            span.glyphicon.glyphicon-upload
+            |  Upload
+      .col-xs-2.col-sm-2.col-md-3.col-lg-3

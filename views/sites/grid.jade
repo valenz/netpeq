@@ -1,0 +1,59 @@
+extends ../includes/header
+
+block content
+
+  .container
+    h1.page-header= title
+    include ../includes/uexc
+        
+    #grid
+      ul.list-inline
+        if files
+          each file, i in files
+            - var a = file.name.split('.')
+            - var ext = a[a.length-1]
+
+            li.thumbnail(style='width: 260px;')
+              .row
+                .col-xs-12.col-sm-12.col-md-12.col-lg-12
+                  .text-left.breakall
+                    span.url
+                    strong
+                      span| /#{file.name}
+
+              .row
+                .col-xs-12.col-sm-12.col-md-12.col-lg-12
+                  if ext == 'mp4' ||  ext == 'webm' || ext == 'ogg'
+                    video
+                      source(src= path +'/'+ file.name type='video/mp4')
+                      source(src= path +'/'+ file.name type='video/webm')
+                      source(src= path +'/'+ file.name type='video/ogg')
+                      | Your browser does not support the video element.
+                  else if ext == 'mpeg' ||  ext == 'wav' || ext == 'ogg'
+                    audio
+                      source(src= path +'/'+ file.name type='audio/mpeg')
+                      source(src= path +'/'+ file.name type='audio/ogg')
+                      source(src= path +'/'+ file.name type='audio/wav')
+                      | Your browser does not support the audio element.
+                  else if ext == 'png' ||  ext == 'jpg' || ext == 'jpeg' || ext == 'gif' || ext == 'bmp' || ext == 'tif' || ext == 'tiff'
+                    img(src= path +'/'+ file.name onerror='loadImg(this);')
+
+              .row
+                .col-xs-12.col-sm-12.col-md-12.col-lg-12
+                  .btn-group.btn-group-xs
+                    a.btn.btn-default(href='../'+path+'/'+file.name title='Permalink')
+                      span.glyphicon.glyphicon-link
+                    a.btn.btn-default(href='../'+path+'/'+file.name title='Download' download)
+                      span.glyphicon.glyphicon-download-alt
+                    a.btn.btn-default(title='File size' disabled=true)
+                      span.glyphicon.glyphicon-file
+                      = ' '+ file.size
+                  .btn-group.btn-group-xs.pull-right
+                    button.update.btn.btn-default(type='submit' title='Update')
+                      span.glyphicon.glyphicon-cog
+                      form(role='form' action='/update' method='post' enctype='multipart/form-data')
+                        input.form-control(type='hidden' name='update' value= path +'/'+ file.name)
+                    button.delete.btn.btn-danger(type='submit' title='Delete')
+                      span.glyphicon.glyphicon-trash
+                      form(role='form' action='/delete' method='post' enctype='multipart/form-data' onsubmit='return confirm("Are you sure you want to submit?")')
+                        input.form-control(type='hidden' name='delete' value= path +'/'+ file.name)

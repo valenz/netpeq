@@ -1,0 +1,613 @@
+extends ../includes/header
+
+block content
+
+  - var md = {};
+  - var a = file.split('.');
+  - var ext = a[a.length-1];
+  - var filename = '';
+  - for(var i = 0; i < a.length-1; i++) {
+    - filename += i+1 == a.length-1 ? a[i] : a[i]+'.';
+  - }
+
+  .container-fluid
+    h1.page-header= title
+    include ../includes/uexc
+      
+    .row
+      // Source
+      .col-xs-12.col-sm-6.col-md-5.col-lg-4
+        h3| Source
+
+        .thumbnail
+          .row
+            .col-xs-9.col-sm-9.col-md-10.col-lg-10
+              .text-left.breakall
+                span.url
+                strong
+                  span| /#{filename +'.'+ ext}
+
+          .row
+            .col-xs-12.col-sm-12.col-md-12.col-lg-12
+              if ext == 'mp4' ||  ext == 'webm' || ext == 'ogg'
+                video#media(controls)
+                  source(src= path +'/'+ file type='video/mp4')
+                  source(src= path +'/'+ file type='video/webm')
+                  source(src= path +'/'+ file type='video/ogg')
+                  | Your browser does not support the video element.
+              else if ext == 'mpeg' ||  ext == 'wav' || ext == 'ogg'
+                audio#media(controls)
+                  source(src= path +'/'+ file type='audio/mpeg')
+                  source(src= path +'/'+ file type='audio/ogg')
+                  source(src= path +'/'+ file type='audio/wav')
+                  | Your browser does not support the audio element.
+              else if ext == 'png' ||  ext == 'jpg' || ext == 'jpeg' || ext == 'gif' || ext == 'bmp' || ext == 'tif' || ext == 'tiff'
+                img(src= path +'/'+ file onerror='loadImg(this);')
+
+          .row
+            .col-xs-12.col-sm-12.col-md-12.col-lg-12
+              .btn-group.btn-group-xs
+                a.btn.btn-default(href='../'+path+'/'+filename +'.'+ ext title='Permalink')
+                  span.glyphicon.glyphicon-link
+                a.btn.btn-default(href='../'+path+'/'+filename +'.'+ ext title='Download' download)
+                  span.glyphicon.glyphicon-download-alt
+                a.btn.btn-default(title='File size' disabled=true)
+                  span.glyphicon.glyphicon-file
+                  = ' '+ filesize
+                button.btn.btn-default#beginTime(type='button' title='Render start time')| Start
+                button.btn.btn-default#endTime(type='button' title='Render end time')| End
+                button.btn.btn-default#resetTime(type='button' title='Reset start and end time')| Reset
+              .btn-group.btn-group-xs.pull-right
+                button.delete.btn.btn-danger(type='submit' title='Delete')
+                  span.glyphicon.glyphicon-trash
+                  form(role='form' action='/delete' method='post' enctype='multipart/form-data' onsubmit='return confirm("Are you sure you want to submit?")')
+                    input.form-control(type='hidden' name='delete' value= path +'/'+ file)
+
+        if streams.length > 2
+          form(role='form' action='/split' method='post' enctype='multipart/form-data')
+            .text-left= 'Found '+ streams.length +' streams. Probably a transport stream.'
+
+
+
+      // Adjustments
+      .col-xs-12.col-sm-6.col-md-7.col-lg-8
+        h3| Adjustments
+        div.thumbnail(role='tabpanel')
+          // Nav tabs
+          ul.nav.nav-tabs(role='tablist')
+            // streams
+            li.dropdown.active
+              a.dropdown-toggle(data-toggle='dropdown' href='#')| Streams
+                span.caret
+              ul.dropdown-menu
+                if streams && streams != 0
+                  each stream, i in streams
+                    - var type = stream.codec_type;
+                    - var str = type.substr(0, 1).toUpperCase() + type.substr(1, type.length);
+                    li
+                      a(href='#'+stream.codec_type+i aria-controls= stream.codec_type+i role='tab' data-toggle='tab')
+                        | #{i}: #{str} - #{stream.codec_name} (id: #{stream.id})
+
+            li(role='presentation')
+              a(href='#level' aria-controls='level' role='tab' data-toggle='tab')| Level
+
+            li(role='presentation')
+              a(href='#style' aria-controls='style' role='tab' data-toggle='tab')| Style
+
+            li(role='presentation')
+              a(href='#format' aria-controls='format' role='tab' data-toggle='tab')| Format
+
+            li(role='presentation')
+              a(href='#presets' aria-controls='presets' role='tab' data-toggle='tab')| Presets
+
+            li.dropdown
+              a.dropdown-toggle(data-toggle='dropdown' href='#')| Filter
+                span.caret
+              ul.dropdown-menu
+                li
+                  a(href='#overlay' aria-controls='overlay' role='tab' data-toggle='tab')| Overlay
+                li
+                  a(href='#drawtext' aria-controls='drawtext' role='tab' data-toggle='tab')| Drawtext
+
+            li(role='presentation')
+              a(href='#save' aria-controls='save' role='tab' data-toggle='tab')| Save
+
+            li(role='presentation')
+              a(href='#console' aria-controls='console' role='tab' data-toggle='tab')| Console
+
+          // Tab panes
+          .tab-content
+            if streams && streams != 0
+              each stream, i in streams
+                .tab-pane(id= stream.codec_type+i class= i == 0 ? 'active' : '' role='tabpanel')
+                  - md[stream.codec_type] = {};
+                  .container-fluid
+                    - var type = stream.codec_type;
+                    - var str = type.substr(0, 1).toUpperCase() + type.substr(1, type.length);
+                    h4| #{i}: #{str} streams
+                    .row
+                      .table-wrapper.scrollable.form-group.thumbnail
+                        table.table.line-wrapper.table-hover
+                          thead
+                            tr
+                              th| Attributes
+                              th| Values
+                          tbody
+                            each value, name in streams[i]
+                              - md[stream.codec_type][name] = value
+                              if name == 'tags' || name == 'disposition'
+                                each tags_dispo_value, tags_dispo_name in value
+                                  - md[stream.codec_type][tags_dispo_name] = tags_dispo_value
+                                  tr
+                                    td
+                                      p= tags_dispo_name
+                                    td
+                                      p= tags_dispo_value
+                              else
+                                tr
+                                  td
+                                    p= name
+                                  td
+                                    p= value
+
+            #level.tab-pane(role='tabpanel')
+
+              - var channels = md.audio ? md.audio.channels : 0;
+              - var duration = Math.floor(md.audio ? md.audio.duration : md.video.duration);
+              - var size = md.video ? md.video.width +'x'+ md.video.height : '';
+              - var ratio = md.video ? md.video.width / md.video.height : '';
+              
+              .container-fluid
+                .row
+                  .col-md-6
+                    h4| Audio
+                    form.settings(role='form' action='javascript:;' method='post' enctype='multipart/form-data')
+                      .thumbnail
+                        .form-group
+                          label.checkbox-inline
+                            input(type='checkbox' name='enableAudioLevel' title='Enables filter for audio')
+                            | Enable Audio Level
+
+                        .form-group
+                          label(for='volume')| Volume in dB:
+                          em
+                            span.rangeValue| 6
+                          .row
+                            .col-md-6
+                              .text-left| 0
+                            .col-md-6
+                              .text-right| 50
+                          input.range(type='range' name='volume' title='Volume' min='0' max='50' step='0.1' defaultValue='6.0' value='6.0')
+
+                        .form-group
+                          label(for='channels')| Channels:
+                          em
+                            span.rangeValue= channels
+                          .row
+                            .col-md-6
+                              .text-left| 1
+                            .col-md-6
+                              .text-right= channels
+                          input.range(type='range' name='channels' title='Channels' min='1' max= channels step='1' defaultValue= channels value= channels)
+
+                        .form-group
+                          label(for='audioQuality')| Audio Quality:
+                          em
+                            span.rangeValue| 0
+                          .row
+                            .col-md-6
+                              .text-left| 0
+                            .col-md-6
+                              .text-right| 5
+                          input.range(type='range' name='audioQuality' title='Audio Quality' min='0' max='5' step='1' defaultValue='0' value='0')
+                  .col-md-6
+                    h4| Video
+                    form.settings(role='form' action='javascript:;' method='post' enctype='multipart/form-data')
+                      .thumbnail
+                        .form-group
+                          label.checkbox-inline
+                            input(type='checkbox' name='enableVideoLevel' title='Enables filter for video')
+                            | Enable Video Level
+
+                        .form-group
+                          label(for='gamma')| Gamma:
+                          em
+                            span.rangeValue| 1
+                          .row
+                            .col-md-6
+                              .text-left| 0.1
+                            .col-md-6
+                              .text-right| 10
+                          input.range(type='range' name='gamma' title='Gamma' min='0.1' max='10' step='0.1' defaultValue='1' value='1')
+
+                        .form-group
+                          label(for='contrast')| Contrast:
+                          em
+                            span.rangeValue| 1
+                          .row
+                            .col-md-6
+                              .text-left| -2
+                            .col-md-6
+                              .text-right| 2
+                          input.range(type='range' name='contrast' title='Contrast' min='-2' max='2' step='0.01' defaultValue='1' value='1')
+
+                        .form-group
+                          label(for='brightness')| Brightness:
+                          em
+                            span.rangeValue| 0
+                          .row
+                            .col-md-6
+                              .text-left| -1
+                            .col-md-6
+                              .text-right| 1
+                          input.range(type='range' name='brightness' title='Brightness' min='-1' max='1' step='0.01' defaultValue='0' value='0')
+
+                        .form-group
+                          label(for='saturation')| Saturation:
+                          em
+                            span.rangeValue| 1
+                          .row
+                            .col-md-6
+                              .text-left| 0
+                            .col-md-6
+                              .text-right| 3
+                          input.range(type='range' name='saturation' title='Saturation' min='0' max='3' step='0.01' defaultValue='1' value='1')
+
+            #style.tab-pane(role='tabpanel')
+
+              .container-fluid
+                .row
+                  .col-xs-12.col-sm-12.col-md-6.col-lg-6
+                    h4| Audio
+                    form.settings(role='form' action='javascript:;' method='post' enctype='multipart/form-data')
+                      .thumbnail
+                        .form-group
+                          label.checkbox-inline(title='Enable audio style')
+                            input(type='checkbox' name='enableAudioStyle' title='Enable audio style')
+                            | Enable Audio Style
+                            
+                        h4| Equalizer
+                        .help-block
+                          | With this filter, the signal-level at and around a selected frequency can be increased or decreased.
+                        .form-group
+                          label(for='eqFrequency')| Frequency in Hz:
+                          input.form-control(type='text' name='eqFrequency' title='Set the filter’s central frequency in Hz.' placeholder='1000, 31,5, 100')
+                    
+                        .form-group
+                          label(for='eqWidthType' title='Set method to specify band-width of filter.')| Band-Width (Type):
+                          .form-group
+                            label.radio-inline
+                              input(type='radio' name='eqWidthType' value='h' checked)
+                              | Hz
+                            label.radio-inline
+                              input(type='radio' name='eqWidthType' value='q')
+                              | Q-Factor
+                            label.radio-inline
+                              input(type='radio' name='eqWidthType' value='o')
+                              | Octave
+                            label.radio-inline
+                              input(type='radio' name='eqWidthType' value='s')
+                              | Slope
+                        
+                        .form-group
+                          label(for='eqWidth')| Width in Hz:
+                          em
+                            span.rangeValue| 0
+                          .row
+                            .col-md-6
+                              .text-left| 0
+                            .col-md-6
+                              .text-right| 200
+                          input.range(type='range' name='eqWidth' min='0' max='400' step='1' defaultValue='0' value='0' title='Specify the band-width of a filter in width_type units.')
+                        
+                        .form-group
+                          label(for='eqGain')| Gain in dB:
+                          em
+                            span.rangeValue| 0
+                          .row
+                            .col-md-6
+                              .text-left| -12
+                            .col-md-6
+                              .text-right| 12
+                          input.range(type='range' name='eqGain' min='-12' max='12' step='0.01' defaultValue='0' value='0' title='Set the required gain or attenuation in dB. Beware of clipping when using a positive gain.')
+
+                  .col-xs-12.col-sm-12.col-md-6.col-lg-6
+                    h4| Video
+                    form.settings(role='form' action='javascript:;' method='post' enctype='multipart/form-data')
+                      .thumbnail
+                        .form-group
+                          label.checkbox-inline(title='Enables video style')
+                            input(type='checkbox' name='enableVideoStyle' title='Enables video style')
+                            | Enable Video Style
+                          label.checkbox-inline(title='Useful when converting an input with non-square pixels')
+                            input(type='checkbox' name='keepRatio' title='Useful when converting an input with non-square pixels')
+                            | Keep Pixel Aspect
+
+                        .row
+                          .col-xs-12.col-sm-12.col-md-12.col-lg-12
+                            .form-group
+                              label(for='size')| Size in 'pixel x pixel':
+                              input.form-control(type='text' name='size' title='Size Width' placeholder='bxh or bx? or ?xh or 50%' value= size)
+                            .form-group
+                              label(for='ratio')| Aspect Ratio:
+                              input.form-control(type='text' name='ratio' title='Aspect Ratio' placeholder='4:3 or 1.33333' value= format.ratio)
+                            .form-group
+                              label(for='autopad')| Pad Color:
+                              select.form-control.selectpicker.show-tick.dropup(name='autopad' data-live-search='true')
+                                option(value='black' selected)| Black
+                                option(value='white')| White
+                                option(value='red')| Red
+                                option(value='green')| Green
+                                option(value='blue')| Blue
+                                option(value='yellow')| Yellow
+                                option(value='orange')| Orange
+                                option(value='pink')| Pink
+                                option(value='random')| Random
+
+                      .form-group#duration.time
+                        label(for='duration')| Duration in Seconds:
+                        em
+                          span.rangeValue| 0
+                        .row
+                          .col-md-6
+                            .text-left| 0
+                          .col-md-6
+                            .text-right= duration
+                        input.range(type='range' name='duration' title='Duration' min='0' max= duration step='1' defaultValue='0' value='0')
+
+                      .form-group#startTimer.time
+                        label(for='startTimer')| Begin in Seconds:
+                        em
+                          span.rangeValue| 0
+                        .row
+                          .col-md-6
+                            .text-left| 0
+                          .col-md-6
+                            .text-right= duration
+                        input.range(type='range' name='startTimer' title='Start Timer' min='0' max= duration step='1' defaultValue='0' value='0')
+
+            #format.tab-pane(role='tabpanel')
+
+              - var samplerate = md.audio ? Math.floor(md.audio.sample_rate / 16000) * 16000 : 0;
+              - var audioBitrate = md.audio ? Math.floor(md.audio.bit_rate / 16000) * 16 : 0;
+              - var videoBitrate = md.video ? md.video.bit_rate / 1000 : 0;
+              - var framerate = md.video ? md.video.r_frame_rate.split('/') : 0;
+              - framerate = framerate.length ? framerate[0] / framerate[1] : 0;
+              - framerate = framerate.toLocaleString();
+
+              .container-fluid
+                .row
+                  .col-md-6
+                    h4| Audio
+                    form.settings(role='form' action='javascript:;' method='post' enctype='multipart/form-data')
+                      .thumbnail
+                        .form-group
+                          label.checkbox-inline(title='Enable audio format')
+                            input(type='checkbox' name='enableAudioFormat' title='Enable audio format')
+                            | Enable Audio Format
+                          label.checkbox-inline(title='Disable audio altogether')
+                            input(type='checkbox' name='disableAudio' title='Disable audio altogether')
+                            | Disable Audio
+
+                        .form-group
+                          label(for='bitrateAudio')| Bitrate in kbps:
+                          em
+                            span.rangeValue= audioBitrate
+                          .row
+                            .col-md-6
+                              .text-left| 0
+                            .col-md-6
+                              .text-right| 320
+                          input.range(type='range' name='bitrateAudio' title='Bitrate' min='0' max='320' step='16' defaultValue= audioBitrate value= audioBitrate)
+
+                        .form-group
+                          label(for='samplerate')| Sample rate in Hz:
+                          em
+                            span.rangeValue= samplerate
+                          .row
+                            .col-md-6
+                              .text-left| 0
+                            .col-md-6
+                              .text-right| 192k
+                          input.range(type='range' name='samplerate' title='Sample rate' min='0' max='192000' step='16000' defaultValue= samplerate value= samplerate)
+
+                  .col-md-6
+                    h4| Video
+                    form.settings(role='form' action='javascript:;' method='post' enctype='multipart/form-data')
+                      .thumbnail
+                        .form-group
+                          label.checkbox-inline(title='Enable video format')
+                            input(type='checkbox' name='enableVideoFormat' title='Enable video format')
+                            | Enable Video Format
+                          label.checkbox-inline(title='Disable video altogether')
+                            input(type='checkbox' name='disableVideo' title='Disable video altogether')
+                            | Disable Video
+
+                        .form-group
+                          label(for='bitrateVideo')| Bitrate in kbps:
+                          input.form-control(type='text' name='bitrateVideo' title='Bitrate' placeholder='128, 1000' value= videoBitrate)
+
+                        .form-group
+                          label(for='framerate')| Frame rate in fps (Hz):
+                          input.form-control(type='text' name='framerate' title='Frame rate' placeholder='29.7' value= framerate)
+
+                        .form-group
+                          label(for='frames')| Frames in images:
+                          input.form-control(type='text' name='frames' title='Encode a certain number of frames' placeholder='240')
+
+                h4| Codecs
+                .row
+                  form.settings(role='form' action='javascript:;' method='post' enctype='multipart/form-data')
+                    .col-md-6
+                      .form-group
+                        label(for='audioCodec')| Audio Codec:
+                        select.form-control.selectpicker.show-tick.dropup(name='audioCodec' data-live-search='true')
+                          option(value='copy' selected)| Copy
+                          option(value='libfdk_aac')| AAC (libfdk_aac - Open-Source)
+                          option(value='libvorbis')| WebM (libvorbis - Open-Source)
+                          option(value='libfaac')| AAC (libfaac - Freeware)
+                          option(value='libmp3lame')| MP3 (libmp3lame - LGPL)
+                          option(value='mp2')| MPEG-1 Audio Layer 2 (mp2 - MPEG LA, LLC)
+                    .col-md-6
+                      .form-group
+                        label(for='videoCodec')| Video Codec:
+                        select.form-control.selectpicker.show-tick.dropup(name='videoCodec' data-live-search='true')
+                          option(value='copy' selected)| Copy
+                          option(value='libx264')| MP4 (libx264 - GNU Public License)
+                          option(value='libvpx')| WebM (libvpx - Open-Source)
+                          option(value='mpeg2video')| MPEG-2 (mpeg2video - MPEG LA, LLC)
+
+            #presets.tab-pane(role='tabpanel')
+              .container-fluid
+                h4| Presets
+                .row
+                  .col-md-6
+                    form.settings(role='form' action='javascript:;' method='post' enctype='multipart/form-data')
+                      .form-group
+                        label(for='presets')| Preset:
+                        select.form-control.selectpicker.show-tick.dropup(name='preset' data-live-search='true')
+                          option(value='' selected)| No preset selected (Choose a preset)
+                          option(value='webmp4')| MP4
+                          option(value='webm')| Webm
+                          option(value='divx')| DivX
+                          option(value='flashvideo')| Flashvideo
+                          option(value='podcast')| Podcast
+
+            #overlay.tab-pane(role='tabpanel')
+              .container-fluid
+                h4| Overlay
+                form.settings(role='form' action='javascript:;' method='post' enctype='multipart/form-data')
+                  .row
+                    .col-xs-12.col-sm-6.col-md-4.col-lg-4
+                      .form-group
+                        label(for='scale')| Scale:
+                        .help-block| iw is input width, ih is input height, -1 preserve the aspect ratio
+                        input.form-control(type='text' name='overlayScale' title='Scale image' placeholder='50:50, 320:-1, iw:ih/2, iw*2:-1' value='iw:ih')
+                      .form-group
+                        label(for='coord')| Offset Width:
+                        .help-block| W is main width, w is overlay width
+                        input.form-control(type='text' name='overlayCoordX' title='Overlay offset for x coordinate' placeholder='50, W-w, (W/2)-(w/2)' value='0')
+                      .form-group
+                        label(for='coord')| Offset Height:
+                        .help-block| H is main height, h is overlay height
+                        input.form-control(type='text' name='overlayCoordY' title='Overlay offset for y coordinate' placeholder='50, H-h, (H/2)-(h/2)' value='0')
+                        input.form-control(type='hidden' name='overlay' value='')
+                    .col-xs-12.col-sm-6.col-md-8.col-lg-8
+                      .form-group
+                        label(for='scale')| Assets:
+                        .help-block| click image to select (click again to deselect)
+                        #grid.scrollable.thumbnail(style='height: 300px;')
+                          ul.list-inline
+                          if assets
+                            each asset,i in assets
+                              - var assetArr = asset.name.split('.')
+                              - var assetExt = assetArr[assetArr.length-1]
+
+                              li.thumbnail.overlayImg(style='width: 120px; cursor: pointer;')
+                                .row
+                                  .col-xs-12.col-sm-12.col-md-12.col-lg-12
+                                    .text-center.small(style='overflow: hidden; direction: rtl;')
+                                      strong
+                                        span= asset.name
+                                .row
+                                  .col-xs-12.col-sm-12.col-md-12.col-lg-12
+                                    img.img-responsive(src= assetsDir +'/'+ asset.name onerror='loadImg(this);')
+                                .row
+                                  .col-xs-4.col-sm-4.col-md-4.col-lg-4.text-left
+                                    a.small(href= assetsDir +'/'+ asset.name)| #link
+                                  .col-xs-8.col-sm-8.col-md-8.col-lg-8.text-right
+                                    a.small(href= assetsDir +'/'+ asset.name download)| #download
+                                .row
+                                  .col-xs-12.col-sm-12.col-md-12.col-lg-12.text-left.small
+                                    span| #{asset.size}
+
+            #drawtext.tab-pane(role='tabpanel')
+              .container-fluid
+                h4| Drawtext
+                form.settings(role='form' action='javascript:;' method='post' enctype='multipart/form-data')
+                  .row
+                    .col-xs-12.col-sm-12.col-md-12.col-lg-12
+                      .form-group
+                        label(for='text')| Text:
+                        input.form-control(type='text' name='drawtext' title='Overlay Text' placeholder='Type here (optional)')
+                  .row
+                    .col-xs-12.col-sm-6.col-md-6.col-lg-6
+                      .form-group
+                        label(for='coord')| Offset Width:
+                        .help-block| W is main width, tw is width of the rendered text, n is number of input frames
+                        input.form-control(type='text' name='drawtextCoordX' title='Overlay offset for x coordinate' placeholder='50, (W/2)-(tw/2), (3*n)-100')
+                    .col-xs-12.col-sm-6.col-md-6.col-lg-6
+                      .form-group
+                        label(for='coord')| Offset Height:
+                        .help-block| H is main height, th is height of the rendered text, lh is height of each text line
+                        input.form-control(type='text' name='drawtextCoordY' title='Overlay offset for y coordinate' placeholder='50, (H/2)-(th/2), H-lh')
+                  .row
+                    .col-xs-12.col-sm-6.col-md-6.col-lg-6
+                      .form-group
+                        label(for='fontsize')| Font Size:
+                        input.form-control(type='text' name='fontsize' title='Font size' placeholder='12, 40' value='40')
+                    .col-xs-12.col-sm-6.col-md-6.col-lg-6
+                      .form-group
+                        label(for='fontcolor')| Font Color:
+                        select.form-control.selectpicker.show-tick.dropup(name='fontcolor' data-live-search='true')
+                          option(value='black')| Black
+                          option(value='white' selected)| White
+                          option(value='red')| Red
+                          option(value='green')| Green
+                          option(value='blue')| Blue
+                          option(value='yellow')| Yellow
+                          option(value='orange')| Orange
+                          option(value='pink')| Pink
+                          option(value='random')| Random
+
+            #save.tab-pane(role='tabpanel')
+              .container-fluid
+                h4| Start Render Process
+                form.settings(role='form' action='javascript:;' method='post' enctype='multipart/form-data')
+                  .form-group
+                    .row
+                      .col-md-6
+                        label(for='audioCodec')| File Name . Extension:
+                        input.form-control(type='hidden' name='path' value= path)
+                        input.form-control(type='hidden' name='filenameOrig' value= file)
+                        input.form-control(type='hidden' name='rid' value= renderid)
+                        input.form-control(type='text' name='filenameNew' placeholder= file)
+                      col-md-6
+                  .form-group
+                    .btn-group.btn-group-sm
+                      button#render.btn.btn-success(type='submit' title='Start the render process')
+                        span.glyphicon.glyphicon-play
+                        |  Render
+                      button#preview.btn.btn-default(type='submit' title='Start the preview process')|  Preview
+
+            #console.tab-pane(role='tabpanel')
+              .container-fluid
+                h4| Console
+                .form-group
+                  .btn-group.btn-group-xs
+                    button.btn.btn-warning(id='sigstop_'+ renderid type='button' disabled='true' title='Halt the process.')
+                      span.glyphicon.glyphicon-pause
+                      |  Pause Process
+                    button.btn.btn-success(id='sigcont_'+ renderid type='button' disabled='true' title='Continue the process.')
+                      span.glyphicon.glyphicon-play
+                      |  Resume Process
+                    button.btn.btn-danger(id='sigkill_'+ renderid type='button' disabled='true' title='Terminate the process.')
+                      span.glyphicon.glyphicon-stop
+                      |  Stop Process
+                    button#resetConsole.btn.btn-default(title='Reset console')
+                      span.glyphicon.glyphicon-file
+                      |  Reset Console
+                .row
+                  .table-wrapper.scrollable.form-group.thumbnail
+                    table.table.line-wrapper
+                      thead
+                        tr
+                          th| Timestamp
+                          th| Message
+                      tbody(id= renderid)
+
+  script(type='text/javascript' src='https://cdn.socket.io/socket.io-1.3.4.js')
+  script(type='text/javascript' src='/javascripts/socket.js')
+  script(type='text/javascript').
+    // Connect to ffmpeg render process with render id
+    socket.emit('conn_proc', $('[name=rid]').val());

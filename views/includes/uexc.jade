@@ -1,0 +1,24 @@
+.messages
+	if success && success != 0
+		.success.text-center.thumbnail(style='background-color: lightgreen;')
+			a.btn-link.pull-right
+				span.glyphicon.glyphicon-remove
+			.glyphicon.glyphicon-ok-sign
+			|  Success
+			div= success
+
+	if info && info != 0
+		.info.bg-info.text-center.thumbnail(style='background-color: lightyellow;')
+			a.btn-link.pull-right
+				span.glyphicon.glyphicon-remove
+			.glyphicon.glyphicon-info-sign
+			|  Info
+			div= info
+
+	if error && error != 0
+		.error.bg-danger.text-center.thumbnail(style='background-color: bisque;')
+			a.btn-link.pull-right
+				span.glyphicon.glyphicon-remove
+			.glyphicon.glyphicon-exclamation-sign
+			|  Error
+			pre.text-left= error
