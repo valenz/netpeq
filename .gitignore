@@ -1,6 +1,5 @@
-# Logs
-logs
-*.log
+# test related
+public/data
 
 # Runtime data
 pids
@@ -26,3 +25,19 @@ node_modules
 
 # Users Environment Variables
 .lock-wscript
+
+# osx
+.DS_Store
+.apdisk
+._.apdisk
+
+# ide
+*.swp
+*~
+
+# misc
+README.html
+*.tgz
+*.log
+logs
+docs
