@@ -150,7 +150,7 @@ socket.on('stat_proc', function(data) {
 								'<span class="glyphicon glyphicon-trash"></span></button>'+
 					'</form></td></tr>'
 			));
-		} else if(data.end.format == 'png' ||  data.end.format == 'jpg' || data.end.format == 'jpeg' || data.end.format == 'gif' || data.end.format == 'bmp' || data.end.format == 'tif' || data.end.format == 'tiff') {
+		} else if(data.end.format == 'png' ||  data.end.format == 'jpg' || data.end.format == 'jpeg' || data.end.format == 'gif' || data.end.format == 'bmp' || data.end.format == 'tif' || data.end.format == 'tiff' || data.end.format == 'eps') {
 			$('#console').find('#'+rid).prepend($(
 				'<tr class="'+mediaId+' bg-warning"><td><p class="log-timestamp">'+timestamp+'</p></td><td>'+
 					'<form role="form" action="javascript:;" method="post" enctype="multipart/form-data">'+

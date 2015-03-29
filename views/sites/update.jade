@@ -41,7 +41,7 @@ block content
                   source(src= path +'/'+ file type='audio/ogg')
                   source(src= path +'/'+ file type='audio/wav')
                   | Your browser does not support the audio element.
-              else if ext == 'png' ||  ext == 'jpg' || ext == 'jpeg' || ext == 'gif' || ext == 'bmp' || ext == 'tif' || ext == 'tiff'
+              else
                 img(src= path +'/'+ file onerror='loadImg(this);')
 
           .row
@@ -508,7 +508,7 @@ block content
                                   .col-xs-12.col-sm-12.col-md-12.col-lg-12
                                     .text-center.small(style='overflow: hidden; direction: rtl;')
                                       strong
-                                        span= asset.name
+                                        span.overlayName= assetsDir +'/'+ asset.name
                                 .row
                                   .col-xs-12.col-sm-12.col-md-12.col-lg-12
                                     img.img-responsive(src= assetsDir +'/'+ asset.name onerror='loadImg(this);')

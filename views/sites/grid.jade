@@ -35,7 +35,7 @@ block content
                       source(src= path +'/'+ file.name type='audio/ogg')
                       source(src= path +'/'+ file.name type='audio/wav')
                       | Your browser does not support the audio element.
-                  else if ext == 'png' ||  ext == 'jpg' || ext == 'jpeg' || ext == 'gif' || ext == 'bmp' || ext == 'tif' || ext == 'tiff'
+                  else
                     img(src= path +'/'+ file.name onerror='loadImg(this);')
 
               .row

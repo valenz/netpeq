@@ -101,7 +101,7 @@ $(document).ready( function() {
 	});
 
 	// Selects only one overlay image
-	$('[id^="overlay"]').find('.overlayImg').on('click', function() {
+	$('#overlay').find('.overlayImg').on('click', function() {
 		$('.overlayImg').each(function() {
 			$(this).css('background-color', 'white');
 		});
@@ -110,11 +110,9 @@ $(document).ready( function() {
 			$(this).css('background-color', 'white');
 			$('#overlay').find('[name="overlay"]').val('');
 		} else {
-			if($(this).find('img').attr('src')) {
-				var tmp = $(this).find('img').attr('src').split('/');
-				$(this).css('background-color', 'lightblue');
-				$('#overlay').find('[name="overlay"]').val(tmp[tmp.length-1]);
-			}
+			var tmp = $(this).find('.overlayName').text().split('/');
+			$(this).css('background-color', 'lightblue');
+			$('#overlay').find('[name="overlay"]').val(tmp[tmp.length-1]);
 		}
 	});
 
