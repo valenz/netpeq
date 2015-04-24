@@ -386,7 +386,7 @@ function postRender(io, _renderids) {
 	    var drawtext_arr = {};
 	    var drawtext_options = [];
 	    var drawtext_cF = [];
-	    var fontfile = '/usr/share/fonts/truetype/ttf-dejavu/DejaVuSans.ttf';
+	    var fontfile = config.custom.font;
 
 	    var drawtext = req.body.drawtext instanceof Array ? req.body.drawtext : [req.body.drawtext];
 	    var coordX = req.body.drawtextCoordX instanceof Array ? req.body.drawtextCoordX : [req.body.drawtextCoordX];

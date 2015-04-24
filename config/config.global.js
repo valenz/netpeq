@@ -72,6 +72,8 @@ var config = module.exports = {
     upload: 'public/data/upload/',
     output: 'public/data/output/',
     preview: 'public/data/preview/',
-    assets: 'public/data/assets/'
+    assets: 'public/data/assets/',
+//    font: '/usr/share/fonts/TTF/DejaVuSans.ttf'
+    font: '/usr/share/fonts/truetype/ttf-dejavu/DejaVuSans.ttf'
   }
 };
