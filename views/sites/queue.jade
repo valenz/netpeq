@@ -42,7 +42,7 @@ block content
                     p.rid= process.rid
                   
                   td
-                    p.pid= process.command.ffmpegProc.pid
+                    p.pid= process.command.ffmpegProc ? process.command.ffmpegProc.pid : 'undefined'
                   
                   td
                     p.niceness= process.command.options.niceness
