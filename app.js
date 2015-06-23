@@ -49,8 +49,9 @@ morgan.token('status', function(req, res) {
   else if (status >= 400) color = 33; // yellow
   else if (status >= 300) color = 36; // cyan
 
-  return '\x1b['+color+'m'+status;
-})
+  return '\x1b[' + color + 'm' + status;
+});
+
 app.use(morgan('\x1b[32m:date[clf]\x1b[0m: :method :url :status \x1b[0m:response-time ms | :res[content-length] | :remote-addr :remote-user HTTP/:http-version | :user-agent'));
 
 // Local Routing Path
@@ -62,46 +63,45 @@ app.use(expressSession(config.app.cookie.options));
 // Flashing
 app.use(flash());
 
-
-
 // Socket connections
-io.on('connection', function(socket){
+io.on('connection', function(socket) {
   socket.on('conn_proc', function(rid) {
     log.info('Client connected. Render id is "%s".', rid);
   });
 
   // Renice increase
   socket.on('reniceup_proc', function(rid) {
-    if(_renderids[rid]) {
+    if (_renderids[rid]) {
       var getNiceness = _renderids[rid].options.niceness;
       var setNiceness = getNiceness == -20 ? -20 : getNiceness - 1;
       _renderids[rid].renice(setNiceness);
       log.warn('Priority of the process "%s" has been increased from %d to %d.', rid, getNiceness, setNiceness);
       io.sockets.emit('stat_proc', {
         renderid: rid,
-        info: 'Priority has been increased from '+ getNiceness +' to '+ setNiceness +'.'
+        info: 'Priority has been increased from ' + getNiceness + ' to ' + setNiceness + '.'
       });
     }
   });
+
   // Renice decrease
   socket.on('renicedown_proc', function(rid) {
-    if(_renderids[rid]) {
+    if (_renderids[rid]) {
       var getNiceness = _renderids[rid].options.niceness;
       var setNiceness = getNiceness == 20 ? 20 : getNiceness + 1;
       _renderids[rid].renice(setNiceness);
       log.warn('Priority of the process "%s" has been decreased from %d to %d.', rid, getNiceness, setNiceness);
       io.sockets.emit('stat_proc', {
         renderid: rid,
-        info: 'Priority has been decreased from '+ getNiceness +' to '+ setNiceness +'.'
+        info: 'Priority has been decreased from ' + getNiceness + ' to ' + setNiceness + '.'
       });
     }
   });
 
   // Halt the process
-  socket.on('stop_proc', function(rid){
-    if(rid == 'sigstopall') {
-      if(_renderids) {
-        for(var rid in _renderids) {
+  socket.on('stop_proc', function(rid) {
+    if (rid == 'sigstopall') {
+      if (_renderids) {
+        for (var rid in _renderids) {
           _renderids[rid].kill('SIGSTOP');
           log.warn('Process "%s" has been paused.', rid);
           io.sockets.emit('stat_proc', {
@@ -111,7 +111,7 @@ io.on('connection', function(socket){
         }
       }
     } else {
-      if(_renderids[rid]) {
+      if (_renderids[rid]) {
         _renderids[rid].kill('SIGSTOP');
         log.warn('Process "%s" has been paused.', rid);
         io.sockets.emit('stat_proc', {
@@ -129,10 +129,10 @@ io.on('connection', function(socket){
   });
 
   // Continue the process
-  socket.on('cont_proc', function(rid){
-    if(rid == 'sigcontall') {
-      if(_renderids) {
-        for(var rid in _renderids) {
+  socket.on('cont_proc', function(rid) {
+    if (rid == 'sigcontall') {
+      if (_renderids) {
+        for (var rid in _renderids) {
           _renderids[rid].kill('SIGCONT');
           log.warn('Process "%s" has been resumed.', rid);
           io.sockets.emit('stat_proc', {
@@ -142,7 +142,7 @@ io.on('connection', function(socket){
         }
       }
     } else {
-      if(_renderids[rid]) {
+      if (_renderids[rid]) {
         _renderids[rid].kill('SIGCONT');
         log.warn('Process "%s" has been resumed.', rid);
         io.sockets.emit('stat_proc', {
@@ -160,16 +160,16 @@ io.on('connection', function(socket){
   });
 
   // Terminate the process
-  socket.on('kill_proc', function(rid){
-    if(rid == 'sigkillall') {
-      if(_renderids) {
-        for(var rid in _renderids) {
+  socket.on('kill_proc', function(rid) {
+    if (rid == 'sigkillall') {
+      if (_renderids) {
+        for (var rid in _renderids) {
           _renderids[rid].kill('SIGKILL');
           log.error('Process "%s" has been killed.', rid);
         }
       }
     } else {
-      if(_renderids[rid]) {
+      if (_renderids[rid]) {
         _renderids[rid].kill('SIGKILL');
         log.error('Process "%s" has been killed.', rid);
       } else {
@@ -182,8 +182,6 @@ io.on('connection', function(socket){
     }
   });
 });
-
-
 
 // Route dependencies
 var routes = require('./routes/routes');
@@ -201,14 +199,12 @@ app.post('/delete', routes.postDelete);
 app.post('/update', routes.postUpdate);
 app.post('/render', routes.postRender(io, _renderids));
 
-
-
 // Error handling
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  if(req.user) {
+  if (req.user) {
     var err = new Error();
-    err.message = 'Failed to load resource "'+ req.url +'". The server responded with a status of 404 (Not Found).';
+    err.message = 'Failed to load resource "' + req.url + '". The server responded with a status of 404 (Not Found).';
     err.status = 404;
     err.method = req.method;
     err.header = req.headers;
@@ -220,7 +216,7 @@ app.use(function(req, res, next) {
 });
 
 // Handles uncaught exceptions.
-process.on('uncaughtException', function (e) {
+process.on('uncaughtException', function(e) {
   log.debug('Caught exception: ', e.stack);
   log.error('Caught exception: ', e.message);
   return;

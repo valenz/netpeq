@@ -20,27 +20,29 @@ module.exports.random = random;
  * @return {String} m Refactored metadata.
  */
 function getMetadata(md) {
-	var m = {};
-	m.streams = [];
-	m.format = md.format;
-	var w = 1, h = 1;
+  var m = {};
+  m.streams = [];
+  m.format = md.format;
+  var w = 1;
+  var h = 1;
 
-	md.streams.forEach(function(stream, i) {
-		var streams = {};
-		for(var s in md.streams[i]) {
-			streams[s] = stream[s];
-			w = s == 'width' ? stream[s] : 1;
-			h = s == 'height' ? stream[s] : 1;
-		}
-		m.streams.push(streams);
-	});
+  md.streams.forEach(function(stream, i) {
+    var streams = {};
+    for (var s in md.streams[i]) {
+      streams[s] = stream[s];
+      w = s == 'width' ? stream[s] : 1;
+      h = s == 'height' ? stream[s] : 1;
+    }
 
-	var r = br.fromDecimal(w / h).toString();
-	r = r != 1 ? r.split('/') : [1,1];
-	r = r[0] +':'+ r[1];
-	m.format.ratio = r;
+    m.streams.push(streams);
+  });
 
-	return m;
+  var r = br.fromDecimal(w / h).toString();
+  r = r != 1 ? r.split('/') : [1, 1];
+  r = r[0] + ':' + r[1];
+  m.format.ratio = r;
+
+  return m;
 }
 
 /**
@@ -49,15 +51,15 @@ function getMetadata(md) {
  * @return {Array} fi File infos.
  */
 function fileInfo(p) {
-	var fi = [];
+  var fi = [];
 
-	var rd = fs.readdirSync(p);
-	for(var i in rd) {
-		var st = fs.statSync(p+rd[i]);
-		fi.push({name: rd[i], size: setUnit(st.size)});
-	}
+  var rd = fs.readdirSync(p);
+  for (var i in rd) {
+    var st = fs.statSync(p + rd[i]);
+    fi.push({name: rd[i], size: setUnit(st.size)});
+  }
 
-	return fi;
+  return fi;
 }
 
 /**
@@ -66,18 +68,18 @@ function fileInfo(p) {
  * @return {String} n Converted to the next higher unit of measurement.
  */
 function setUnit(n) {
-	var l = n.toString().length;
-	if(l >= 4 && l <= 6) {
-		return +(n / 1024).toFixed(2) +' KB';
-	} else if(l >= 7 && l <= 9) {
-		return +(n / Math.pow(1024, 2)).toFixed(2) +' MB';
-	} else if(l >= 10 && l <= 12) {
-		return +(n / Math.pow(1024, 3)).toFixed(2) +' GB';
-	} else if(l >= 13) {
-		return +(n / Math.pow(1024, 4)).toFixed(2) +' TB';
-	} else {
-		return n +' B';
-	}
+  var l = n.toString().length;
+  if (l >= 4 && l <= 6) {
+    return +(n / 1024).toFixed(2) + ' KB';
+  } else if (l >= 7 && l <= 9) {
+    return +(n / Math.pow(1024, 2)).toFixed(2) + ' MB';
+  } else if (l >= 10 && l <= 12) {
+    return +(n / Math.pow(1024, 3)).toFixed(2) + ' GB';
+  } else if (l >= 13) {
+    return +(n / Math.pow(1024, 4)).toFixed(2) + ' TB';
+  } else {
+    return n + ' B';
+  }
 }
 
 /**
@@ -86,7 +88,7 @@ function setUnit(n) {
  * @return {String} str
  */
 function random(len) {
-  var c = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+  var c = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
   var l = len >= 10 ? len : 24;
   var str = '';
 

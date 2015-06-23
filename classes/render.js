@@ -1,4 +1,4 @@
-var o = new Object();
+var o = {};
 
 /**
  * Constructor
@@ -10,7 +10,7 @@ function Render() {}
  * @return {o} Object
  */
 Render.prototype.get = function() {
-	return this.o;
+  return this.o;
 };
 
 /**
@@ -18,7 +18,7 @@ Render.prototype.get = function() {
  * @param {o} Object
  */
 Render.prototype.set = function(o) {
-	this.o = o;
+  this.o = o;
 };
 
 // Exports class
